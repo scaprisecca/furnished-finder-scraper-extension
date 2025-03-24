@@ -65,41 +65,59 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       const priceText = priceElement ? priceElement.textContent.trim() : '';
       const price = priceText.replace(/[^0-9.]/g, '') || 'N/A';
 
-      // Get address - look for address in multiple locations
-      const addressElement = listing.querySelector('[data-testid="address"], .text-grey-dark');
-      const address = addressElement ? addressElement.textContent.trim() : 'N/A';
+      // Initialize variables
+      let beds = 'N/A';
+      let baths = 'N/A';
+      let address = 'N/A';
 
-      // Get property type and details - look for details text
-      const detailsElement = listing.querySelector('.text-grey-dark');
-      const detailsText = detailsElement ? detailsElement.textContent.trim() : '';
-      
-      // Extract property type from details text
-      const propertyType = detailsText.split('•')[0]?.trim() || 'N/A';
+      // Find the tooltip element and get the span that follows it
+      const tooltipElement = listing.querySelector('[role="tooltip"][data-testid="tooltip"]');
+      if (tooltipElement) {
+        // Get all spans with class mt-1 leading-4
+        const spans = listing.querySelectorAll('span.mt-1.leading-4');
+        spans.forEach(span => {
+          const text = span.textContent.trim();
+          // Check if this span contains bedroom/bathroom info
+          if (text.includes('Bedroom') && text.includes('Bathroom')) {
+            // Split on the hyphen to separate beds and baths
+            const [bedroomPart, bathroomPart] = text.split('-').map(part => part.trim());
+            // Extract numbers
+            const bedsMatch = bedroomPart.match(/(\d+)/);
+            const bathsMatch = bathroomPart.match(/(\d+)/);
+            beds = bedsMatch ? bedsMatch[1] : 'N/A';
+            baths = bathsMatch ? bathsMatch[1] : 'N/A';
+          } else if (!text.includes('Available:')) {
+            // If it's not the bedroom/bathroom span and not the availability span, it's probably the address
+            address = text;
+          }
+        });
+      }
 
-      // Get beds and baths from the details text
-      const bedsMatch = detailsText.match(/(\d+)\s*bed/i);
-      const bathsMatch = detailsText.match(/(\d+)\s*bath/i);
-      const beds = bedsMatch ? bedsMatch[1] : 'N/A';
-      const baths = bathsMatch ? bathsMatch[1] : 'N/A';
+      // Get property type from the flex items-center justify-between class
+      const propertyTypeElement = listing.querySelector('.mb-2.flex.items-center.justify-between');
+      let propertyType = 'N/A';
+      if (propertyTypeElement) {
+        const text = propertyTypeElement.textContent.trim();
+        // Extract just the property type without the location
+        propertyType = text.split('in')[0].trim();
+      }
 
-      // Get square footage if available
-      const sqftMatch = detailsText.match(/(\d+)\s*sqft/i);
-      const sqft = sqftMatch ? sqftMatch[1] : 'N/A';
+      // Get square footage from the tooltip or details section
+      let sqft = 'N/A';
+      const sqftMatch = tooltipElement ? tooltipElement.textContent.match(/(\d+)\s*sqft/i) : null;
+      if (sqftMatch) {
+        sqft = sqftMatch[1];
+      }
 
       // Log the extracted data for debugging
-      console.log('Extracted listing data:', {
-        propertyTitle,
-        propertyUrl,
-        price,
-        beds,
-        baths,
-        address,
-        propertyType,
-        sqft,
-        detailsText
+      console.log('Raw elements found:', {
+        tooltipElement: tooltipElement?.textContent,
+        propertyTypeElement: propertyTypeElement?.textContent,
+        bedsAndBaths: `${beds} beds, ${baths} baths`,
+        address: address
       });
 
-      return {
+      const extractedData = {
         propertyTitle,
         propertyUrl,
         price,
@@ -109,6 +127,9 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
         propertyType,
         sqft
       };
+
+      console.log('Extracted listing data:', extractedData);
+      return extractedData;
     } catch (error) {
       console.error('Error scraping property listing:', error);
       return null;
