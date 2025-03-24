@@ -125,14 +125,9 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       // Wait for the listings container to load
       const listingsContainer = await waitForElement(['#serp_default_view']);
       
-      // Get the property cards container
-      const propertyCardsContainer = listingsContainer.querySelector('[data-testid="property-cards"]');
-      if (!propertyCardsContainer) {
-        throw new Error('Property cards container not found');
-      }
-      
-      // Get all property listings - try multiple selectors
-      const listings = Array.from(propertyCardsContainer.querySelectorAll('[data-testid^="property-card-"]'));
+      // Get all property listings directly from the container
+      // Each listing is wrapped in an <a> tag with data-testid="native-link"
+      const listings = Array.from(listingsContainer.querySelectorAll('a[data-testid="native-link"] > div[data-testid^="property-card-"]'));
       
       console.log('Found listings:', listings.length);
       if (!listings.length) {
@@ -140,7 +135,7 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       }
 
       // Log the HTML structure for debugging
-      console.log('Property cards container HTML:', propertyCardsContainer.innerHTML);
+      console.log('Property cards container HTML:', listingsContainer.innerHTML);
 
       console.log(`Found ${listings.length} listings`);
 
