@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Furnished Finder Scraper</title>
+  <link href="styles/output.css" rel="stylesheet">
+  <style>
+    body {
+      width: 300px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="flex flex-col space-y-4">
+    <h1 class="text-lg font-semibold text-gray-900">Furnished Finder Scraper</h1>
+    
+    <div id="status" class="text-sm text-gray-600 hidden">
+      <div class="flex items-center space-x-2">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+        <span>Scraping in progress...</span>
+      </div>
+    </div>
+
+    <div id="error" class="text-sm text-red-600 bg-red-50 p-2 rounded hidden">
+      <span id="error-message"></span>
+    </div>
+
+    <button id="scrapeButton" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition-colors">
+      Start Scraping
+    </button>
+
+    <div class="text-xs text-gray-500">
+      Note: Make sure you're on a Furnished Finder search results page before scraping.
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
