@@ -71,6 +71,24 @@ const injectContentScript = async (tabId) => {
   }
 };
 
+// Function to get city name from URL
+const getCityFromUrl = (url) => {
+  try {
+    const urlPath = new URL(url).pathname;
+    const pathParts = urlPath.split('/').filter(part => part);
+    return pathParts[pathParts.length - 1].toLowerCase();
+  } catch (error) {
+    console.error('Error extracting city from URL:', error);
+    return 'unknown';
+  }
+};
+
+// Function to get formatted date
+const getFormattedDate = () => {
+  const date = new Date();
+  return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+};
+
 // Listen for messages from content script and popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('Background script received message:', message);
@@ -113,13 +131,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const csvData = convertToCSV(message.data);
       console.log('CSV data generated:', csvData);
       
+      // Get the current date and city
+      const date = getFormattedDate();
+      const city = getCityFromUrl(sender.tab.url);
+      
+      // Create filename in the format: YYYY-MM-DD_city_furnished-finder-listings.csv
+      const filename = `${date}_${city}_furnished-finder-listings.csv`;
+      
       // Create a data URL for the CSV content
       const dataUrl = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
       
       // Download using chrome.downloads API
       chrome.downloads.download({
         url: dataUrl,
-        filename: 'furnished_finder_listings.csv',
+        filename: filename,
         saveAs: true
       }, (downloadId) => {
         if (chrome.runtime.lastError) {
