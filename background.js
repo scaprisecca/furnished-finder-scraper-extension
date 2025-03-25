@@ -5,7 +5,6 @@ const convertToCSV = (data) => {
     'Price',
     'Beds',
     'Baths',
-    'Address',
     'Property Type',
     'Square Footage',
     'Property URL'
@@ -16,7 +15,6 @@ const convertToCSV = (data) => {
     item.price,
     item.beds,
     item.baths,
-    item.address,
     item.propertyType,
     item.sqft,
     item.propertyUrl

@@ -68,7 +68,6 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       // Initialize variables
       let beds = 'N/A';
       let baths = 'N/A';
-      let address = 'N/A';
 
       // Find the tooltip element and get the span that follows it
       const tooltipElement = listing.querySelector('[role="tooltip"][data-testid="tooltip"]');
@@ -86,9 +85,6 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
             const bathsMatch = bathroomPart.match(/(\d+)/);
             beds = bedsMatch ? bedsMatch[1] : 'N/A';
             baths = bathsMatch ? bathsMatch[1] : 'N/A';
-          } else if (!text.includes('Available:')) {
-            // If it's not the bedroom/bathroom span and not the availability span, it's probably the address
-            address = text;
           }
         });
       }
@@ -98,8 +94,12 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       let propertyType = 'N/A';
       if (propertyTypeElement) {
         const text = propertyTypeElement.textContent.trim();
-        // Extract just the property type without the location
-        propertyType = text.split('in')[0].trim();
+        // If the text contains "Entire place", just use that
+        if (text.includes('Entire place')) {
+          propertyType = 'Entire place';
+        } else {
+          propertyType = text.split('in')[0].trim();
+        }
       }
 
       // Get square footage from the tooltip or details section
@@ -113,8 +113,7 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
       console.log('Raw elements found:', {
         tooltipElement: tooltipElement?.textContent,
         propertyTypeElement: propertyTypeElement?.textContent,
-        bedsAndBaths: `${beds} beds, ${baths} baths`,
-        address: address
+        bedsAndBaths: `${beds} beds, ${baths} baths`
       });
 
       const extractedData = {
@@ -123,7 +122,6 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
         price,
         beds,
         baths,
-        address,
         propertyType,
         sqft
       };
