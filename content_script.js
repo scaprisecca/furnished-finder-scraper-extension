@@ -102,13 +102,6 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
         }
       }
 
-      // Get square footage from the tooltip or details section
-      let sqft = 'N/A';
-      const sqftMatch = tooltipElement ? tooltipElement.textContent.match(/(\d+)\s*sqft/i) : null;
-      if (sqftMatch) {
-        sqft = sqftMatch[1];
-      }
-
       // Log the extracted data for debugging
       console.log('Raw elements found:', {
         tooltipElement: tooltipElement?.textContent,
@@ -122,8 +115,7 @@ if (window.hasOwnProperty('furnishedFinderScraperInitialized')) {
         price,
         beds,
         baths,
-        propertyType,
-        sqft
+        propertyType
       };
 
       console.log('Extracted listing data:', extractedData);

@@ -6,7 +6,6 @@ const convertToCSV = (data) => {
     'Beds',
     'Baths',
     'Property Type',
-    'Square Footage',
     'Property URL'
   ];
 
@@ -16,7 +15,6 @@ const convertToCSV = (data) => {
     item.beds,
     item.baths,
     item.propertyType,
-    item.sqft,
     item.propertyUrl
   ].map(field => `"${String(field).replace(/"/g, '""')}"`));
 
